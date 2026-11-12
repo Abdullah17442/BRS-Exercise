@@ -1,0 +1,23 @@
+{
+  "name": "brs-exercise",
+  "version": "1.0.0",
+  "description": "University Library Book Reservation API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "token": "node generate-token.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abdullah17442/BRS-Exercise.git"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.22.3",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2"
+  }
+}
