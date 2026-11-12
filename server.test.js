@@ -6,11 +6,18 @@ const { createApp, HOLD_MS } = require('./server');
 
 const SECRET = 'test-secret';
 const START = new Date('2026-05-01T09:00:00.000Z');
+const TEST_COPIES = [
+  { id: 'ita-1', bookId: 'intro-to-algorithms', status: 'AVAILABLE' },
+  { id: 'cc-1', bookId: 'clean-code', status: 'AVAILABLE' },
+  { id: 'cc-2', bookId: 'clean-code', status: 'AVAILABLE' },
+  { id: 'sicp-1', bookId: 'sicp', status: 'AVAILABLE' },
+  { id: 'ddia-1', bookId: 'ddia', status: 'AVAILABLE' },
+];
 
 // Fresh app per test, with a clock the test can move forward.
-function setup({ enabled = true } = {}) {
+function setup({ enabled = true, copies = TEST_COPIES } = {}) {
   let current = START.getTime();
-  const app = createApp({ secret: SECRET, reservationsEnabled: enabled, now: () => new Date(current) });
+  const app = createApp({ secret: SECRET, reservationsEnabled: enabled, now: () => new Date(current), copies });
   return {
     app,
     state: app.locals.state,
@@ -31,6 +38,8 @@ test('AC1: an available copy is held for the student for exactly 24 hours', asyn
   const res = await borrow('s1', { bookId: 'intro-to-algorithms' });
   assert.equal(res.status, 201);
   assert.equal(res.body.status, 'RESERVED');
+  assert.equal(res.body.availabilityStatus, 'AVAILABLE');
+  assert.equal(res.body.message, 'You can collect the book.');
   assert.equal(res.body.reservation.copyId, 'ita-1');
   assert.equal(res.body.reservation.expiresAt, new Date(START.getTime() + HOLD_MS).toISOString());
 });
@@ -42,6 +51,8 @@ test('AC2: with no copies available the student joins the waitlist and sees thei
   const s3 = await borrow('s3', { bookId: 'intro-to-algorithms' });
   assert.equal(s2.status, 202);
   assert.equal(s2.body.status, 'WAITLISTED');
+  assert.equal(s2.body.availabilityStatus, 'UNAVAILABLE');
+  assert.equal(s2.body.message, 'Waiting for availability of the book.');
   assert.equal(s2.body.waitlist.position, 1);
   assert.equal(s3.body.waitlist.position, 2);
 });

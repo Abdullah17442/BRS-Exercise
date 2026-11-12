@@ -19,7 +19,7 @@ const DEFAULT_BOOKS = {
   ddia: 'Designing Data-Intensive Applications',
 };
 const DEFAULT_COPIES = [
-  { id: 'book001-1', bookId: 'BOOK001', status: 'AVAILABLE' },
+  { id: 'book001-1', bookId: 'BOOK001', status: 'UNAVAILABLE' },
   { id: 'ita-1', bookId: 'intro-to-algorithms', status: 'AVAILABLE' },
   { id: 'cc-1', bookId: 'clean-code', status: 'AVAILABLE' },
   { id: 'cc-2', bookId: 'clean-code', status: 'AVAILABLE' },
@@ -150,6 +150,8 @@ function createApp({
       reservations.push(reservation);
       return res.status(201).json({
         status: 'RESERVED',
+        availabilityStatus: 'AVAILABLE',
+        message: 'You can collect the book.',
         reservation: { id: reservation.id, bookId, copyId: copy.id, expiresAt: reservation.expiresAt.toISOString() },
       });
     }
@@ -158,6 +160,8 @@ function createApp({
     waitlist.push(entry);
     return res.status(202).json({
       status: 'WAITLISTED',
+      availabilityStatus: 'UNAVAILABLE',
+      message: 'Waiting for availability of the book.',
       waitlist: { id: entry.id, bookId, position: queueFor(bookId).indexOf(entry) + 1 },
     });
   });
