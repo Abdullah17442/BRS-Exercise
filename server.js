@@ -189,7 +189,20 @@ function loadDotEnv(path = require('node:path').join(__dirname, '.env')) {
   }
 }
 
-module.exports = { createApp, authenticate, loadDotEnv, HOLD_MS, MAX_ACTIVE };
+const vercelApp = process.env.JWT_SECRET
+  ? createApp({ secret: process.env.JWT_SECRET })
+  : express();
+
+if (!process.env.JWT_SECRET) {
+  vercelApp.use((req, res) => {
+    res.status(500).json({
+      error: { code: 'CONFIGURATION_ERROR', message: 'JWT_SECRET is not configured.' },
+    });
+  });
+}
+
+Object.assign(vercelApp, { createApp, authenticate, loadDotEnv, HOLD_MS, MAX_ACTIVE });
+module.exports = vercelApp;
 
 // Only start listening when run directly (`npm start`), not when imported by tests.
 if (require.main === module) {

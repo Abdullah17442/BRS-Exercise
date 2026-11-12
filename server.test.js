@@ -2,7 +2,8 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
-const { createApp, HOLD_MS } = require('./server');
+const server = require('./server');
+const { createApp, HOLD_MS } = server;
 
 const SECRET = 'test-secret';
 const START = new Date('2026-05-01T09:00:00.000Z');
@@ -13,6 +14,11 @@ const TEST_COPIES = [
   { id: 'sicp-1', bookId: 'sicp', status: 'AVAILABLE' },
   { id: 'ddia-1', bookId: 'ddia', status: 'AVAILABLE' },
 ];
+
+test('exports an Express request handler for Vercel', () => {
+  assert.equal(typeof server, 'function');
+  assert.equal(typeof server.listen, 'function');
+});
 
 // Fresh app per test, with a clock the test can move forward.
 function setup({ enabled = true, copies = TEST_COPIES } = {}) {

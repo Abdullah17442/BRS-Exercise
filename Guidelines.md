@@ -74,6 +74,10 @@ or blocking findings remain unresolved.
 - Keep project build and test commands usable by Vercel's deployment pipeline.
 - Do not deploy manually from a developer's local machine; use the configured
   Vercel deployment flow.
+- The deployed Node.js entry point must export a request handler or server
+  (`module.exports` in CommonJS), not only a helper object.
+- Configure required secrets such as `JWT_SECRET` in Vercel's environment
+  settings; never commit them.
 
 ## Node.js layered architecture
 
